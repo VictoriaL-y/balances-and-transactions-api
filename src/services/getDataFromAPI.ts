@@ -7,21 +7,31 @@ try {
       }
     })
     if (!response.ok) {
-      console.log("couldn't get data from Banxware API");
-      return ({
-        message: "Couldn't get data from Banxware API",
-        error: response.statusText
-      })
+      console.log("Couldn't get data from Banxware API");
+        return {
+          data: {
+          message: "Couldn't get data from Banxware API",
+          error: response.statusText
+        },
+        isSuccesfull: false
+      }
     }
     const data = await response.json();
-    console.log("succesfully got data from Banxware API");
-    return data;
+    console.log("Succesfully got data from Banxware API");
+    return {
+      data: data,
+      isSuccesfull: true
+    };
   } catch (err) {
-    console.error(err);
-    return ({
-      message: "Couldn't get data from Banxware API",
-      error: err
-    })
+    console.log("Couldn't get data from Banxware API, the error is " + err);
+    return {
+      data: {
+        message: "Couldn't get data from Banxware API",
+        error: err
+      },
+      isSuccesfull: false
+    }
+  
   }
 }
 
