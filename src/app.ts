@@ -31,6 +31,15 @@ app.get("/transactions", async (req, res) => {
     transactionsRes.data.transactions.sort((a: JsonObject, b: JsonObject) => {
       return Date.parse(b.date) - Date.parse(a.date);
     })
+
+
+    // let processedTransactionsArr = transactionsRes.data.transactions.filter((transaction: JsonObject) => {
+    //   return transaction.status === "PROCESSED";
+    // })
+    // const transactions = res.json(processedTransactionsArr);
+
+
+
     const transactions = res.json(transactionsRes.data.transactions);
     console.log("Got all the transactions");
     return transactions;

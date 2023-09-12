@@ -39,19 +39,16 @@ export async function getHistoricalBalance<T>(url: string, apiKey: string, dateF
       return Date.parse(b.date) - Date.parse(a.date);
     })
 
-    // get a period from today(30/06/2022) until the beginning of the transactions history
-    // and get only processed transactions from the current date until the date of the specified period's end
-    let processedTransactionsArr = transactionsRes.data.transactions.filter((transaction: JsonObject) => {
-      return Date.parse(transaction.date) > Date.parse(dateTo) && transaction.status === "PROCESSED";
-    })
-
+    // get only processed transactions from the date that starts after the specified period's end and ends today
+    const filteredTransactionsArr = getFilteredTransactionsArr(transactionsRes.data.transactions, dateTo);
+    
     // get the current balance
     const currentBalance = await balanceRes.data.amount
     console.log("The current balance is " + currentBalance);
 
     // calculate the balance that the client had at the end of the specified period
     // subtract from the current balance all processed transactions:
-    const balanceOfDateTo = currentBalance + processedTransactionsArr.reduce((sum: number, transaction: JsonObject) => sum - transaction.amount, 0)
+    const balanceOfDateTo = currentBalance + filteredTransactionsArr.reduce((sum: number, transaction: JsonObject) => sum - transaction.amount, 0)
     console.log("The balance of the last day of the specified time period was: " + balanceOfDateTo);
 
     return getDailyBalance(transactionsRes.data.transactions, balanceOfDateTo, dateFrom, dateTo, sort);
@@ -64,12 +61,12 @@ export async function getHistoricalBalance<T>(url: string, apiKey: string, dateF
   }
 }
 
-function checkDatesFormatValidity(dateFrom: string, dateTo: string) {
+export function checkDatesFormatValidity(dateFrom: string, dateTo: string) {
   const regEx = /^\d{4}-\d{2}-\d{2}$/;
   return !dateFrom.match(regEx) || !dateTo.match(regEx)
 }
 
-function checkDatesExistence(dateFrom: string, dateTo: string) {
+export function checkDatesExistence(dateFrom: string, dateTo: string) {
   let dFrom = new Date(dateFrom);
   let dNumFrom = dFrom.getTime();
   let dTo = new Date(dateTo);
@@ -81,11 +78,18 @@ function checkDatesExistence(dateFrom: string, dateTo: string) {
   return (!dNumFrom && dNumFrom !== 0) || (!dNumTo && dNumTo !== 0)
 }
 
-function checkDateRangeValidity(dateFrom: string, dateTo: string) {
+export function checkDateRangeValidity(dateFrom: string, dateTo: string) {
   return Date.parse(dateFrom) > Date.parse(dateTo);
 }
 
-function getDailyBalance(transactions: Array<JsonObject>, balanceOfDateTo: number, dateFrom: string, dateTo: string, sort: string) {
+export function getFilteredTransactionsArr(transactions: Array<JsonObject>, dateTo: string) {
+  const filteredTransactionsArr = transactions.filter((transaction: JsonObject) => {
+    return Date.parse(transaction.date) > Date.parse(dateTo) && transaction.status === "PROCESSED";
+  })
+  return filteredTransactionsArr;
+}
+
+export function getDailyBalance(transactions: Array<JsonObject>, balanceOfDateTo: number, dateFrom: string, dateTo: string, sort: string | undefined) {
 
   let dailyBalanceArr = [];
   let tempDate = "";
@@ -98,13 +102,13 @@ function getDailyBalance(transactions: Array<JsonObject>, balanceOfDateTo: numbe
 
     if (Date.parse(transaction.date) >= Date.parse(dateFrom)
       && Date.parse(transaction.date) <= Date.parse(dateTo)) {
-
-        balanceOfDateTo -= transaction.amount;
+    console.log(transaction.date + " is transaction.date and " + dateTo + " is dateTo")
 
       // get date in format DD/MM/YYYY
       let dateInNewFormat = transaction.date.slice(0, 10).split('-').reverse().join('/')
 
       if (tempDate === dateInNewFormat) {
+        balanceOfDateTo -= transaction.amount;
         continue;
       } else {
         if (sort === "desc" || !sort) { // it'll be possible to use the route without sort parameter and by default the order will be descendent
@@ -128,9 +132,8 @@ function getDailyBalance(transactions: Array<JsonObject>, balanceOfDateTo: numbe
             message: 'Invalid sort preference. See proper request format in Readme.dm.'
           })
         }
-
+        balanceOfDateTo -= transaction.amount;
         tempDate = dateInNewFormat;
-
       }
     }
   }
