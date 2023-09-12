@@ -12,21 +12,30 @@ export async function getHistoricalBalance(url: string, apiKey: string, dateFrom
     if (!checkDatesFormatValidity(dateFrom, dateTo)) {
       console.log("Invalid dates format: " + dateFrom + " or/and " + dateTo);
       return ({
-        message: 'Invalid dates format. See proper request format in Readme.dm'
+        status: 400,
+        data: {
+          message: 'Invalid dates format. See proper request format in Readme.dm'
+        }
       });
     }
 
     if (!checkDatesExistence(dateFrom, dateTo)) {
       console.log("At least one of the dates doesn't exist: " + dateFrom + " or/and " + dateTo);
       return ({
+        status: 400,
+        data: {
         message: "At least one of the dates doesn't exist (e.g. Feb 29th). Please check your input"
+        }
       });
     }
 
     if (!checkDatesRangeValidity(dateFrom, dateTo)) {
       console.log("The start date " + dateFrom + " is later that the end date " + dateTo);
       return ({
+        status: 400,
+        data: {
         message: "The start date is later than the end date. Please check your input"
+        }
       });
     }
 
@@ -35,15 +44,15 @@ export async function getHistoricalBalance(url: string, apiKey: string, dateFrom
     dateTo += 'T23:59:59.999Z';
 
     // sort the transactions array by descending date
-    transactionsRes.data.transactions.sort((a: JsonObject, b: JsonObject) => {
+    transactionsRes.dataFromAPI.transactions.sort((a: JsonObject, b: JsonObject) => {
       return Date.parse(b.date) - Date.parse(a.date);
     })
 
     // get only processed transactions from the date that starts after the specified period's end and ends today
-    const filteredTransactionsArr = getFilteredTransactionsArr(transactionsRes.data.transactions, dateTo);
+    const filteredTransactionsArr = getFilteredTransactionsArr(transactionsRes.dataFromAPI.transactions, dateTo);
 
     // get the current balance
-    const currentBalance = await balanceRes.data.amount
+    const currentBalance = await balanceRes.dataFromAPI.amount
     console.log("The current balance is " + currentBalance);
 
     // calculate the balance that the client had at the end of the specified period
@@ -51,12 +60,23 @@ export async function getHistoricalBalance(url: string, apiKey: string, dateFrom
     const balanceOfDateTo = currentBalance + filteredTransactionsArr.reduce((sum: number, transaction: JsonObject) => sum - transaction.amount, 0)
     console.log("The balance of the last day of the specified time period was: " + balanceOfDateTo);
 
-    return getDailyBalance(transactionsRes.data.transactions, balanceOfDateTo, dateFrom, dateTo, sort);
+    return getDailyBalance(transactionsRes.dataFromAPI.transactions, balanceOfDateTo, dateFrom, dateTo, sort);
   } else {
     console.log("Was it succesfull to get transactions data? " + transactionsRes.isSuccesfull + ". Was it succesfull to get balance data? " + balanceRes.isSuccesfull);
-    return {
-      transactionsResponse: transactionsRes.data,
-      balanceResponse: balanceRes.data
+    if (!transactionsRes.isSuccesfull) {
+      return {
+        status: transactionsRes.data.status,
+        data: {
+        transactionsResponse: transactionsRes.data,
+        }
+      }
+    } else {
+      return {
+        status: balanceRes.data.status,
+        data: {
+        transactionsResponse: transactionsRes.data,
+        }
+      }
     }
   }
 }
@@ -67,10 +87,12 @@ export function checkDatesFormatValidity(dateFrom: string, dateTo: string) {
 }
 
 export function checkDatesExistence(dateFrom: string, dateTo: string) {
-  let dFrom = new Date(dateFrom);
+  const dateFromCorrected = dateFrom.replace(/[^a-zA-Z0-9]/g, '-');
+  let dFrom = new Date(dateFromCorrected);
   let dNumFrom = dFrom.getTime();
 
-  let dTo = new Date(dateTo);
+  const dateToCorrected = dateTo.replace(/[^a-zA-Z0-9]/g, '-')
+  let dTo = new Date(dateToCorrected);
   let dNumTo = dTo.getTime();
 
   // console.log(dFrom.toISOString().slice(0, 10) === dateFrom);
@@ -78,7 +100,8 @@ export function checkDatesExistence(dateFrom: string, dateTo: string) {
 
   if ((!dNumFrom && dNumFrom !== 0) || (!dNumTo && dNumTo !== 0)) { // check if NaN
     return false;
-  } else if(dFrom.toISOString().slice(0, 10) !== dateFrom) { // check if invalid (e.g. 2022-02-30)
+  } else if ((dFrom.toISOString().slice(0, 10) !== dateFromCorrected)
+    || (dTo.toISOString().slice(0, 10) !== dateToCorrected)) { // check if invalid (e.g. 2022-02-30)
     return false;
   } else {
     return true;
@@ -135,7 +158,10 @@ export function getDailyBalance(transactions: Array<JsonObject>, balanceOfDateTo
         } else {
           console.log("Invalid sort preference: " + sort);
           return ({
+            status: 400,
+            data: {
             message: 'Invalid sort preference. See proper request format in Readme.dm.'
+            }
           })
         }
         balanceOfDateTo -= transaction.amount;
@@ -144,5 +170,8 @@ export function getDailyBalance(transactions: Array<JsonObject>, balanceOfDateTo
     }
   }
   console.log("Succesfully got the daily balace for the specific date range: from " + dateFrom + " to " + dateTo + ", the sorting order is " + sort);
-  return dailyBalanceArr;
+  return {
+    status: 200,
+    data: dailyBalanceArr
+  }
 }

@@ -19,7 +19,7 @@ app.get("/balances", async (req, res) => {
   } else {
     console.log("Couldn't get the current balance");
   }
-  const balance = res.json(balanceRes.data);
+  const balance = res.status(balanceRes.data.status).json(balanceRes.dataFromAPI);
 
   return balance;
 });
@@ -28,7 +28,7 @@ app.get("/transactions", async (req, res) => {
   let transactionsRes = await getDataFromAPI(url + "/transactions", apiKey);
   // sort array by descending date
   if (transactionsRes.isSuccesfull) {
-    transactionsRes.data.transactions.sort((a: JsonObject, b: JsonObject) => {
+    transactionsRes.dataFromAPI.transactions.sort((a: JsonObject, b: JsonObject) => {
       return Date.parse(b.date) - Date.parse(a.date);
     })
 
@@ -38,12 +38,12 @@ app.get("/transactions", async (req, res) => {
     // })
     // const transactions = res.json(processedTransactionsArr);
 
-    const transactions = res.json(transactionsRes.data.transactions);
+    const transactions = res.status(200).json(transactionsRes.dataFromAPI.transactions);
     console.log("Got all the transactions");
     return transactions;
   } else {
     console.log("Couldn't get the transactions");
-    return res.json(transactionsRes.data);
+    return res.status(transactionsRes.data.status).json(transactionsRes.data);
   }
 
 });
@@ -56,13 +56,13 @@ app.get("/historical-balances", async (req, res) => {
 
   if (!dateFrom || !dateTo) {
     console.log("At least one date wasn't provided. Right now the date range starts on " + dateFrom + ", ends on " + dateTo);
-    return res.json({
+    return res.status(400).json({
       message: 'Missing arguments, provide dates. See proper request format in Readme.dm'
     })
   }
   console.log("The date range starts on " + dateFrom + ", ends on " + dateTo + ", the sorting order is " + sort);
   const historicalBalance = await getHistoricalBalance(url, apiKey, dateFrom, dateTo, sort);
-  return res.json(historicalBalance);
+  return res.status(historicalBalance.status).json(historicalBalance.data);
 });
 
 // this is default in case of unmatched routes
@@ -71,7 +71,7 @@ app.use((req, res) => {
   } else {
     console.log("Invalid request, this route doesn't exist: " + req.url);
   }
-  res.json({
+  res.status(404).json({
     error: {
       'status': 404,
       'title': "Not Found",

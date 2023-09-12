@@ -19,7 +19,11 @@ describe("Validate that dates validity check returns false with invalid input", 
 // checkDatesExistence()
 describe("Validate that dates existence check returns true with valid input", () => {
     it("Dates existance should be valid", () => {
-        const res = checkDatesExistence("2022-04-01", "2022-04-04");
+        let res = checkDatesExistence("2022-04-01", "2022-04-04");
+        expect(res).toEqual(true);
+        res = checkDatesExistence("2022.04-04", "2022-04-08");
+        expect(res).toEqual(true);
+        res = checkDatesExistence("2022!04]04", "2022#04%08");
         expect(res).toEqual(true);
     });
 });
@@ -63,6 +67,8 @@ describe("Validate that getProcessedTransactionsArr() returns arr with only proc
         res = getFilteredTransactionsArr(transactions, "2022-06-28");
         expect(res).toEqual([{"amount":-32,"currency":"EUR","date":"2022-06-30T08:12:17.084Z","status":"PROCESSED"},
                             {"amount":3,"currency":"EUR","date":"2022-06-29T02:16:18.171Z","status":"PROCESSED"}]);
+        res = getFilteredTransactionsArr(transactions, "2022-07-28");
+        expect(res).toEqual([]);
     });
 });
 
@@ -75,14 +81,16 @@ const processedTransactions = [{"amount":-32,"currency":"EUR","date":"2022-06-30
 
 describe("Validate that getDailyBalance() returns right array with valid input", () => {
     it("Daily balance array should be correct", () => {
-        let res = getDailyBalance(processedTransactions, 10032, "2022-06-28T00:00:00.000Z", "2022-06-29T23:59:59.999Z", "asc");
+        let res = getDailyBalance(processedTransactions, 10032, "2022-06-28T00:00:00.000Z", "2022-06-29T23:59:59.999Z", "asc").data;
         expect(res).toEqual([{"date":"28/06/2022","amount":10234,"currency":"EUR"},
                             {"date":"29/06/2022","amount":10032,"currency":"EUR"}]);
-        res = getDailyBalance(processedTransactions, 10000, "2022-06-29T00:00:00.000Z", "2022-06-30T23:59:59.999Z", "desc");
+        res = getDailyBalance(processedTransactions, 10000, "2022-06-29T00:00:00.000Z", "2022-06-30T23:59:59.999Z", "desc").data;
         expect(res).toEqual([{"date":"30/06/2022","amount":10000,"currency":"EUR"},
                             {"date":"29/06/2022","amount":10032,"currency":"EUR"}]);
-        res = getDailyBalance(processedTransactions, 10234, "2022-06-27T00:00:00.000Z", "2022-06-28T23:59:59.999Z", "");
+        res = getDailyBalance(processedTransactions, 10234, "2022-06-27T00:00:00.000Z", "2022-06-28T23:59:59.999Z", "").data;
         expect(res).toEqual([{"date":"28/06/2022","amount":10234,"currency":"EUR"},
                             {"date":"27/06/2022","amount":10287,"currency":"EUR"}]);
+        res = getDailyBalance(processedTransactions, 10000, "2022-04-27T00:00:00.000Z", "2022-05-28T23:59:59.999Z", "").data;
+        expect(res).toEqual([]);
     });
 });
