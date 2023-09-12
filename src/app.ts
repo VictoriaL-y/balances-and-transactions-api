@@ -38,8 +38,6 @@ app.get("/transactions", async (req, res) => {
     // })
     // const transactions = res.json(processedTransactionsArr);
 
-
-
     const transactions = res.json(transactionsRes.data.transactions);
     console.log("Got all the transactions");
     return transactions;

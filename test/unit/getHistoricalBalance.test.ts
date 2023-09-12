@@ -1,4 +1,5 @@
-import { checkDatesFormatValidity, checkDatesExistence, checkDateRangeValidity, getFilteredTransactionsArr, getDailyBalance } from "../../src/services/getHistoricalBalances";
+import { describe, it, expect } from 'vitest';
+import { checkDatesFormatValidity, checkDatesExistence, checkDatesRangeValidity, getFilteredTransactionsArr, getDailyBalance } from "../../src/services/getHistoricalBalances";
 
 // checkDatesFormatValidity()
 describe("Validate that dates validity check returns true with valid input", () => {
@@ -33,14 +34,14 @@ describe("Validate that dates existence check returns false with invalid input",
 // checkDateRangeValidity()
 describe("Validate that dates range check returns true with valid input", () => {
     it("Dates range should be valid", () => {
-        const res = checkDateRangeValidity("2022-01-03", "2022-01-05");
+        const res = checkDatesRangeValidity("2022-01-03", "2022-01-05");
         expect(res).toEqual(true);
     });
 });
 
 describe("Validate that dates range check returns false with invalid input", () => {
     it("Dates range should be invalid", () => {
-        const res = checkDateRangeValidity( "2022-01-05", "2022-01-03");
+        const res = checkDatesRangeValidity( "2022-01-05", "2022-01-03");
         expect(res).toEqual(false);
     });
 });
@@ -55,21 +56,15 @@ const transactions = [{"amount":923,"currency":"EUR","date":"2022-06-30T19:11:29
 
 describe("Validate that getProcessedTransactionsArr() returns arr with only processed transactions (desc order) from the dates range's end until today", () => {
     it("Filtered transactions array should be correct", () => {
-        const res = getFilteredTransactionsArr(transactions, "2022-06-27");
+        let res = getFilteredTransactionsArr(transactions, "2022-06-27");
         expect(res).toEqual([{"amount":-32,"currency":"EUR","date":"2022-06-30T08:12:17.084Z","status":"PROCESSED"},
                             {"amount":3,"currency":"EUR","date":"2022-06-29T02:16:18.171Z","status":"PROCESSED"},
                             {"amount":261,"currency":"EUR","date":"2022-06-27T15:59:48.568Z","status":"PROCESSED"}]);
-    });
-});
-
-describe("Validate that getProcessedTransactionsArr() returns arr with only processed transactions (desc order) from the dates range's end until today", () => {
-    it("Filtered transactions array should be correct", () => {
-        const res = getFilteredTransactionsArr(transactions, "2022-06-28");
+        res = getFilteredTransactionsArr(transactions, "2022-06-28");
         expect(res).toEqual([{"amount":-32,"currency":"EUR","date":"2022-06-30T08:12:17.084Z","status":"PROCESSED"},
                             {"amount":3,"currency":"EUR","date":"2022-06-29T02:16:18.171Z","status":"PROCESSED"}]);
     });
 });
-
 
 // getDailyBalance
 const processedTransactions = [{"amount":-32,"currency":"EUR","date":"2022-06-30T08:12:17.084Z","status":"PROCESSED"}, 
@@ -80,33 +75,14 @@ const processedTransactions = [{"amount":-32,"currency":"EUR","date":"2022-06-30
 
 describe("Validate that getDailyBalance() returns right array with valid input", () => {
     it("Daily balance array should be correct", () => {
-        const res = getDailyBalance(processedTransactions, 10000, "2022-06-28", "2022-06-29", "asc");
+        let res = getDailyBalance(processedTransactions, 10032, "2022-06-28T00:00:00.000Z", "2022-06-29T23:59:59.999Z", "asc");
         expect(res).toEqual([{"date":"28/06/2022","amount":10234,"currency":"EUR"},
                             {"date":"29/06/2022","amount":10032,"currency":"EUR"}]);
-    });
-});
-
-describe("Validate that getDailyBalance() returns right array with valid input", () => {
-    it("Daily balance array should be correct", () => {
-        const res = getDailyBalance(processedTransactions, 10000, "2022-06-29", "2022-06-30", "desc");
+        res = getDailyBalance(processedTransactions, 10000, "2022-06-29T00:00:00.000Z", "2022-06-30T23:59:59.999Z", "desc");
         expect(res).toEqual([{"date":"30/06/2022","amount":10000,"currency":"EUR"},
                             {"date":"29/06/2022","amount":10032,"currency":"EUR"}]);
-    });
-});
-
-describe("Validate that getDailyBalance() returns right array with valid input", () => {
-    it("Daily balance array should be correct", () => {
-        const res = getDailyBalance(processedTransactions, 10000, "2022-06-27", "2022-06-28", undefined);
+        res = getDailyBalance(processedTransactions, 10234, "2022-06-27T00:00:00.000Z", "2022-06-28T23:59:59.999Z", "");
         expect(res).toEqual([{"date":"28/06/2022","amount":10234,"currency":"EUR"},
                             {"date":"27/06/2022","amount":10287,"currency":"EUR"}]);
     });
 });
-
-
-
-// describe("getHistoricalBalance", () => {
-//   it("should return the boilerplate object", () => {
-//     const res = getHistoricalBalance();
-//     expect(res).toEqual({ hello: "world" });
-//   });
-// });

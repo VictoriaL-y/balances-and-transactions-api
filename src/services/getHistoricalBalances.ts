@@ -1,7 +1,7 @@
 import { getDataFromAPI } from "./getDataFromAPI";
 import { JsonObject } from "swagger-ui-express";
 
-export async function getHistoricalBalance<T>(url: string, apiKey: string, dateFrom: string, dateTo: string, sort: string) {
+export async function getHistoricalBalance(url: string, apiKey: string, dateFrom: string, dateTo: string, sort: string) {
   //get all the transactions from the API
   const transactionsRes = await getDataFromAPI(url + "/transactions", apiKey);
   const balanceRes = await getDataFromAPI(url + "/balances", apiKey);
@@ -9,21 +9,21 @@ export async function getHistoricalBalance<T>(url: string, apiKey: string, dateF
   if (transactionsRes.isSuccesfull && balanceRes.isSuccesfull) {
     console.log("Succesfully got all the transactions and balance data");
     // check if the data that user entered is invalid
-    if (checkDatesFormatValidity(dateFrom, dateTo)) {
+    if (!checkDatesFormatValidity(dateFrom, dateTo)) {
       console.log("Invalid dates format: " + dateFrom + " or/and " + dateTo);
       return ({
         message: 'Invalid dates format. See proper request format in Readme.dm'
       });
     }
 
-    if (checkDatesExistence(dateFrom, dateTo)) {
+    if (!checkDatesExistence(dateFrom, dateTo)) {
       console.log("At least one of the dates doesn't exist: " + dateFrom + " or/and " + dateTo);
       return ({
         message: "At least one of the dates doesn't exist (e.g. Feb 29th). Please check your input"
-      }); // NaN value
+      });
     }
 
-    if(checkDateRangeValidity(dateFrom, dateTo)) {
+    if (!checkDatesRangeValidity(dateFrom, dateTo)) {
       console.log("The start date " + dateFrom + " is later that the end date " + dateTo);
       return ({
         message: "The start date is later than the end date. Please check your input"
@@ -41,7 +41,7 @@ export async function getHistoricalBalance<T>(url: string, apiKey: string, dateF
 
     // get only processed transactions from the date that starts after the specified period's end and ends today
     const filteredTransactionsArr = getFilteredTransactionsArr(transactionsRes.data.transactions, dateTo);
-    
+
     // get the current balance
     const currentBalance = await balanceRes.data.amount
     console.log("The current balance is " + currentBalance);
@@ -63,23 +63,30 @@ export async function getHistoricalBalance<T>(url: string, apiKey: string, dateF
 
 export function checkDatesFormatValidity(dateFrom: string, dateTo: string) {
   const regEx = /^\d{4}-\d{2}-\d{2}$/;
-  return !dateFrom.match(regEx) || !dateTo.match(regEx)
+  return !(!dateFrom.match(regEx) && !dateTo.match(regEx))
 }
 
 export function checkDatesExistence(dateFrom: string, dateTo: string) {
   let dFrom = new Date(dateFrom);
   let dNumFrom = dFrom.getTime();
+
   let dTo = new Date(dateTo);
   let dNumTo = dTo.getTime();
 
   // console.log(dFrom.toISOString().slice(0, 10) === dateFrom);
   // console.log(dTo.toISOString().slice(0, 10) === dateTo);
 
-  return (!dNumFrom && dNumFrom !== 0) || (!dNumTo && dNumTo !== 0)
+  if ((!dNumFrom && dNumFrom !== 0) || (!dNumTo && dNumTo !== 0)) { // check if NaN
+    return false;
+  } else if(dFrom.toISOString().slice(0, 10) !== dateFrom) { // check if invalid (e.g. 2022-02-30)
+    return false;
+  } else {
+    return true;
+  }
 }
 
-export function checkDateRangeValidity(dateFrom: string, dateTo: string) {
-  return Date.parse(dateFrom) > Date.parse(dateTo);
+export function checkDatesRangeValidity(dateFrom: string, dateTo: string) {
+  return Date.parse(dateFrom) <= Date.parse(dateTo);
 }
 
 export function getFilteredTransactionsArr(transactions: Array<JsonObject>, dateTo: string) {
@@ -89,7 +96,7 @@ export function getFilteredTransactionsArr(transactions: Array<JsonObject>, date
   return filteredTransactionsArr;
 }
 
-export function getDailyBalance(transactions: Array<JsonObject>, balanceOfDateTo: number, dateFrom: string, dateTo: string, sort: string | undefined) {
+export function getDailyBalance(transactions: Array<JsonObject>, balanceOfDateTo: number, dateFrom: string, dateTo: string, sort: string) {
 
   let dailyBalanceArr = [];
   let tempDate = "";
@@ -102,7 +109,6 @@ export function getDailyBalance(transactions: Array<JsonObject>, balanceOfDateTo
 
     if (Date.parse(transaction.date) >= Date.parse(dateFrom)
       && Date.parse(transaction.date) <= Date.parse(dateTo)) {
-    console.log(transaction.date + " is transaction.date and " + dateTo + " is dateTo")
 
       // get date in format DD/MM/YYYY
       let dateInNewFormat = transaction.date.slice(0, 10).split('-').reverse().join('/')
