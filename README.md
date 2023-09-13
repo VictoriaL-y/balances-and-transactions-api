@@ -10,10 +10,10 @@ The project also has a [Swagger](https://swagger.io/specification/) documentatio
 This endpoint returns the balance for a specific date, namely `2022-06-30`:
 
 ```json
-{ 
-	"amount": 10000, 
-	"currency": "EUR", 
-	"date": "2022-06-30T23:59:59.577Z" 
+{
+    "amount": 10000, 
+    "currency": "EUR",
+    "date": "2022-06-30T23:59:59.577Z"
 }
 ```
 
