@@ -81,7 +81,7 @@ const processedTransactions = [{"amount":-32,"currency":"EUR","date":"2022-06-30
                             {"amount":-53,"currency":"EUR","date":"2022-06-28T11:45:38.663Z","status":"PROCESSED"},
                             {"amount":261,"currency":"EUR","date":"2022-06-27T15:59:48.568Z","status":"PROCESSED"}];
 
-describe("getDailyBalance() returns right array with valid input", () => {
+describe("getDailyBalance() returns a correct array with valid input", () => {
     it("Daily balance array should be correct", () => {
         let res = getDailyBalance(processedTransactions, 10032, "2022-06-28T00:00:00.000Z", "2022-06-29T23:59:59.999Z", "asc").data;
         expect(res).toEqual([{"date":"28/06/2022","amount":10234,"currency":"EUR"},
