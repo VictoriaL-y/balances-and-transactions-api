@@ -22,23 +22,23 @@ This endpoint returns the balance for a specific date, namely `2022-06-30`:
 This endpoint returns a list of all past transactions done by that customer:
 
 ```json
-{ 
-	"transactions": [ 
-		{ 
-			"amount": -765, 
-			"currency": "EUR", 
-			"date": "2022-02-07T09:57:27.235Z", 
-			"status": "BOOKED" 
-		}, 
-		{ 
-			"amount": -911, 
-			"currency": "EUR", 
-			"date": "2022-01-03T22:00:09.002Z", 
-			"status": "PROCESSED" 
-		}, 
+{
+    "transactions": [
+        {
+            "amount": -765,
+            "currency": "EUR",
+            "date": "2022-02-07T09:57:27.235Z",
+            "status": "BOOKED"
+        },
+        {
+            "amount": -911,
+            "currency": "EUR",
+            "date": "2022-01-03T22:00:09.002Z",
+            "status": "PROCESSED"
+        }
         ...
-	] 
-} 
+    ]
+}
 ```
 
 ### `GET /historical-balances`
