@@ -2,13 +2,12 @@
 
 ## Intro
 
-This project implements REST endpoints for fetching balances, transactions and daily account balances within a specific date range. Proper error handling, input validation, logging, and unit, integration tests have been included to ensure data integrity and code reliability.
+This project implements REST endpoints for fetching balances, transactions and daily account balance within a specific date range. Proper error handling, input validation, logging, and unit, integration tests have been included to ensure data integrity and code reliability.
 The project also has a [Swagger](https://swagger.io/specification/) documentation with 3 endpoints.
 
 ### `GET /balances` 
 
-This endpoint returns what was the balance of the customer on a specific date, namely `2022-06-30`.
-For example:  
+This endpoint returns the balance for a specific date, namely `2022-06-30`:
 
 ```json
 { 
@@ -20,7 +19,7 @@ For example:
 
 ### `GET /transactions`
 
-This is going to return a list of all past transactions done by that customer:
+This endpoint returns a list of all past transactions done by that customer:
 
 ```json
 { 
@@ -44,7 +43,7 @@ This is going to return a list of all past transactions done by that customer:
 
 ### `GET /historical-balances`
 
-It provides a list of balances for the requested days.
+This endpoint provides a list of daily balances for the requested date range.
 
 Example request:
 
@@ -52,8 +51,9 @@ Example request:
 `GET /historical-balances?from=2022-01-03&to=2022-01-05&sort=desc`
 ```
 
-Note, that dates should be provided in the following format: `YYYY-MM-DD`.
-Sort parameter should be written like `desc` or `asc` (descending or ascending date order), but it's not required and by default the order will be descendent.
+This endpoint accepts 3 parameters: `from`, `to`, `sort`. `from` and `to` are mandatory while `sort` is optional.
+The dates should be provided in the following format: `YYYY-MM-DD`.
+The sort parameter has two options: `desc` or `asc` (descending or ascending date order), by default the order will be descendent.
 
 Example response:
 
@@ -61,7 +61,7 @@ Example response:
 { 
 	[ 
 		{ 
-			"date": "05/01/2022",
+            "date": "05/01/2022",
             "amount": 1514,
             "currency": "EUR" 
 		}, 
@@ -79,11 +79,11 @@ Example response:
 } 
 ```
 
-The response includes an array of objects, each representing a daily balance with date, amount, and currency.
+The response includes an array of objects, each representing a daily balance with a date, amount, and currency.
 
 ### `GET /api-docs`
 
-An extra endpoint where you can visualize the API Documentation
+An extra endpoint where you can visualize the API Documentation with a [Swagger](https://swagger.io/specification/).
 
 ## How to start developing using this project?
 
