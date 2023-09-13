@@ -126,7 +126,7 @@
         {
           "name": "sort",
           "in": "query",
-          "description": "Sorting order of the objects in the array of balances: desc or asc",
+          "description": "Sorting order of daily balances: desc or asc",
           "type": "string",
           "example": "desc"
         }

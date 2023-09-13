@@ -95,9 +95,6 @@ export function checkDatesExistence(dateFrom: string, dateTo: string) {
   let dTo = new Date(dateToCorrected);
   let dNumTo = dTo.getTime();
 
-  // console.log(dFrom.toISOString().slice(0, 10) === dateFrom);
-  // console.log(dTo.toISOString().slice(0, 10) === dateTo);
-
   if ((!dNumFrom && dNumFrom !== 0) || (!dNumTo && dNumTo !== 0)) { // check if NaN
     return false;
   } else if ((dFrom.toISOString().slice(0, 10) !== dateFromCorrected)

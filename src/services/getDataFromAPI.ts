@@ -25,7 +25,6 @@ try {
       },
       dataFromAPI: data,
       isSuccesfull: true
-
     };
   } catch (err) {
     console.log("Couldn't get data from Banxware API, the error is " + err);

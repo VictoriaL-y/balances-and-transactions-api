@@ -31,13 +31,6 @@ app.get("/transactions", async (req, res) => {
     transactionsRes.dataFromAPI.transactions.sort((a: JsonObject, b: JsonObject) => {
       return Date.parse(b.date) - Date.parse(a.date);
     })
-
-
-    // let processedTransactionsArr = transactionsRes.data.transactions.filter((transaction: JsonObject) => {
-    //   return transaction.status === "PROCESSED";
-    // })
-    // const transactions = res.json(processedTransactionsArr);
-
     const transactions = res.status(200).json(transactionsRes.dataFromAPI.transactions);
     console.log("Got all the transactions");
     return transactions;
@@ -45,7 +38,6 @@ app.get("/transactions", async (req, res) => {
     console.log("Couldn't get the transactions");
     return res.status(transactionsRes.data.status).json(transactionsRes.data);
   }
-
 });
 
 app.get("/historical-balances", async (req, res) => {
