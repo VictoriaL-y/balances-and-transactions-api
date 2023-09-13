@@ -58,25 +58,25 @@ The sort parameter has two options: `desc` or `asc` (descending or ascending dat
 Example response:
 
 ```json
-{ 
-	[ 
-		{ 
+{
+    [
+        {
             "date": "05/01/2022",
             "amount": 1514,
-            "currency": "EUR" 
-		}, 
-		{ 
-			"date": "04/01/2022",
+            "currency": "EUR"
+        },
+        {
+            "date": "04/01/2022",
             "amount": 968,
-            "currency": "EUR" 
-		}, 
-        { 
-			"date": "03/01/2022",
+            "currency": "EUR"
+        },
+        {
+            "date": "03/01/2022",
             "amount": 1422,
-            "currency": "EUR" 
-		}
-	] 
-} 
+            "currency": "EUR"
+        }
+    ]
+}
 ```
 
 The response includes an array of objects, each representing a daily balance with a date, amount, and currency.
@@ -115,6 +115,18 @@ npm start
 
 ### Running the tests
 
+The project has 11 unit and 3 integration tests. 
+
+The unit tests verify if the user provided a correct date range, dates and check the output of 2 funtions:
+- for filtering the transactions to get only processed, strating at the end of the date range and ends on `2022-06-30`.
+- for creating an array of the daily balances, based on the processed transactions, the balance, which the user had at the end of the date range, the date range and the sorting order.
+
+The integration test check:
+- if the user passed an invalid route
+- if the user got a proper balance from `GET /balances`
+- if the user got a proper array of objects, each representing a daily balance with a date, amount, and currency.
+
 ```sh
+# Run the tests
 npm test
 ```

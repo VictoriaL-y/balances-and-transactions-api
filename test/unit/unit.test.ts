@@ -2,14 +2,14 @@ import { describe, it, expect } from 'vitest';
 import { checkDatesFormatValidity, checkDatesExistence, checkDatesRangeValidity, getFilteredTransactionsArr, getDailyBalance } from "../../src/services/getHistoricalBalances";
 
 // checkDatesFormatValidity()
-describe("Validate that dates validity check returns true with valid input", () => {
+describe("Dates validity check returns true with valid input", () => {
     it("Dates format should be valid", () => {
         const res = checkDatesFormatValidity("2022-05-01", "2022-06-01");
         expect(res).toEqual(true);
     });
 });
 
-describe("Validate that dates validity check returns false with invalid input", () => {
+describe("Dates validity check returns false with invalid input", () => {
     it("Dates format should be invalid", () => {
         let res = checkDatesFormatValidity("2022/05/01", "202206-01");
         expect(res).toEqual(false);
@@ -19,7 +19,7 @@ describe("Validate that dates validity check returns false with invalid input", 
 });
 
 // checkDatesExistence()
-describe("Validate that dates existence check returns true with valid input", () => {
+describe("Dates existence check returns true with valid input", () => {
     it("Dates existance should be valid", () => {
         let res = checkDatesExistence("2022-04-01", "2022-04-04");
         expect(res).toEqual(true);
@@ -30,7 +30,7 @@ describe("Validate that dates existence check returns true with valid input", ()
     });
 });
 
-describe("Validate that dates existence check returns false with invalid input", () => {
+describe("Dates existence check returns false with invalid input", () => {
     it("Dates existance should be invalid", () => {
         const res = checkDatesExistence("2022-02-30", "2022-03-01");
         expect(res).toEqual(false);
@@ -38,14 +38,14 @@ describe("Validate that dates existence check returns false with invalid input",
 });
 
 // checkDateRangeValidity()
-describe("Validate that dates range check returns true with valid input", () => {
+describe("Dates range check returns true with valid input", () => {
     it("Dates range should be valid", () => {
         const res = checkDatesRangeValidity("2022-01-03", "2022-01-05");
         expect(res).toEqual(true);
     });
 });
 
-describe("Validate that dates range check returns false with invalid input", () => {
+describe("Dates range check returns false with invalid input", () => {
     it("Dates range should be invalid", () => {
         const res = checkDatesRangeValidity( "2022-01-05", "2022-01-03");
         expect(res).toEqual(false);
@@ -60,7 +60,7 @@ const transactions = [{"amount":923,"currency":"EUR","date":"2022-06-30T19:11:29
                     {"amount":-933,"currency":"EUR","date":"2022-06-28T10:16:42.074Z","status":"CANCELLED"},
                     {"amount":261,"currency":"EUR","date":"2022-06-27T15:59:48.568Z","status":"PROCESSED"}]
 
-describe("Validate that getProcessedTransactionsArr() returns arr with only processed transactions (desc order) from the dates range's end until today", () => {
+describe("getProcessedTransactionsArr() returns arr with only processed transactions (desc order) from the dates range's end until today", () => {
     it("Filtered transactions array should be correct", () => {
         let res = getFilteredTransactionsArr(transactions, "2022-06-27");
         expect(res).toEqual([{"amount":-32,"currency":"EUR","date":"2022-06-30T08:12:17.084Z","status":"PROCESSED"},
@@ -81,7 +81,7 @@ const processedTransactions = [{"amount":-32,"currency":"EUR","date":"2022-06-30
                             {"amount":-53,"currency":"EUR","date":"2022-06-28T11:45:38.663Z","status":"PROCESSED"},
                             {"amount":261,"currency":"EUR","date":"2022-06-27T15:59:48.568Z","status":"PROCESSED"}];
 
-describe("Validate that getDailyBalance() returns right array with valid input", () => {
+describe("getDailyBalance() returns right array with valid input", () => {
     it("Daily balance array should be correct", () => {
         let res = getDailyBalance(processedTransactions, 10032, "2022-06-28T00:00:00.000Z", "2022-06-29T23:59:59.999Z", "asc").data;
         expect(res).toEqual([{"date":"28/06/2022","amount":10234,"currency":"EUR"},

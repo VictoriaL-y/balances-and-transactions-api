@@ -25,7 +25,7 @@ describe("Balance and Transactions API", () => {
 
 describe("Balance and Transactions API", () => {
   describe("GET /historical-balances", () => {
-    it("Should recieve a proper array with the daily balances for the specified date range", async () => {
+    it("Should recieve a proper array with the daily balances within a specific date range", async () => {
       let response = await request(app).get("/historical-balances?from=2022-06-28&to=2022-06-30&sort=asc");
 
       expect(response.status).toBe(200);
