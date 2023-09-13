@@ -11,7 +11,9 @@ describe("Validate that dates validity check returns true with valid input", () 
 
 describe("Validate that dates validity check returns false with invalid input", () => {
     it("Dates format should be invalid", () => {
-        const res = checkDatesFormatValidity("2022/05/01", "202206-01");
+        let res = checkDatesFormatValidity("2022/05/01", "202206-01");
+        expect(res).toEqual(false);
+        res = checkDatesFormatValidity("2022.05/01", "2022.06-01");
         expect(res).toEqual(false);
     });
 });
@@ -91,6 +93,6 @@ describe("Validate that getDailyBalance() returns right array with valid input",
         expect(res).toEqual([{"date":"28/06/2022","amount":10234,"currency":"EUR"},
                             {"date":"27/06/2022","amount":10287,"currency":"EUR"}]);
         res = getDailyBalance(processedTransactions, 10000, "2022-04-27T00:00:00.000Z", "2022-05-28T23:59:59.999Z", "").data;
-        expect(res).toEqual([]);
+        expect(res).toEqual({message: "Nothing was found for your request"});
     });
 });

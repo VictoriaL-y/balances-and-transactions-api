@@ -72,11 +72,7 @@ app.use((req, res) => {
     console.log("Invalid request, this route doesn't exist: " + req.url);
   }
   res.status(404).json({
-    error: {
-      'status': 404,
-      'title': "Not Found",
-      'message': 'Invalid Request'
-    }
+      message: "Invalid request, this route doesn't exist"
   });
 });
 

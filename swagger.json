@@ -98,6 +98,84 @@
           }
         }
       }
+    },
+    "/historical-balances": {
+      "get": {
+        "security": [
+          {
+            "xApiKey": []
+          }
+        ],
+        "description": "Get a list of daily balances for a specific date range.",
+        "parameters": [{
+          "name": "from",
+          "in": "query",
+          "description": "Start date of the date range",
+          "required": "true",
+          "type": "string",
+          "example": "2022-05-04"
+        },
+        {
+          "name": "to",
+          "in": "query",
+          "description": "End date of the date range",
+          "required": "true",
+          "type": "string",
+          "example": "2022-05-06"
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "description": "Sorting order of the objects in the array of balances: desc or asc",
+          "type": "string",
+          "example": "desc"
+        }
+      ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "transactions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "date": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "amount": {
+                            "type": "number"
+                          },
+                          "currency": {
+                            "type": "string",
+                            "enum": [
+                              "EUR"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid request, this route doesn't exist"
+          },
+          "400": {
+            "description": "Invalid/missing dates parameters or an invalid sorting order"
+          },
+          "502": {
+            "description": "Couldn't get data from Banxware API"
+          }
+        }
+      }
     }
   },
   "components": {

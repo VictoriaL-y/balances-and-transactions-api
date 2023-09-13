@@ -7,11 +7,7 @@ describe("Balance and Transactions API", () => {
         const response = await request(app).get("/hgf");
         expect(response.status).toBe(404);
         expect(response.body).toEqual({
-            error: {
-              'status': 404,
-              'title': "Not Found",
-              'message': 'Invalid Request'
-            }
+              message: "Invalid request, this route doesn't exist"
           });
       });
     });
@@ -47,13 +43,17 @@ describe("Balance and Transactions API", () => {
       expect(response.status).toBe(200);
       expect(response.body).toEqual([{"date":"03/05/2022","amount":14245,"currency":"EUR"}]);
 
+      response = await request(app).get("/historical-balances?from=2023-05-03&to=2023-05-03");
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({message: "Nothing was found for your request"});
+
       response = await request(app).get("/historical-balances?from=2022.05/03&to=2022/05/05");
       expect(response.status).toBe(400);
       expect(response.body).toEqual({message: "Invalid dates format. See proper request format in Readme.dm"});
 
       response = await request(app).get("/historical-balances?from=202205-03&to=2022-05-03");
       expect(response.status).toBe(400);
-      expect(response.body).toEqual({message: "At least one of the dates doesn't exist (e.g. Feb 29th). Please check your input"});
+      expect(response.body).toEqual({message: "Invalid dates format. See proper request format in Readme.dm"});
 
       response = await request(app).get("/historical-balances?from=2022-05-03&to=2022-13-05");
       expect(response.status).toBe(400);

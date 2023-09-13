@@ -24,7 +24,7 @@ export async function getHistoricalBalance(url: string, apiKey: string, dateFrom
       return ({
         status: 400,
         data: {
-        message: "At least one of the dates doesn't exist (e.g. Feb 29th). Please check your input"
+          message: "At least one of the dates doesn't exist (e.g. Feb 29th). Please check your input"
         }
       });
     }
@@ -34,7 +34,7 @@ export async function getHistoricalBalance(url: string, apiKey: string, dateFrom
       return ({
         status: 400,
         data: {
-        message: "The start date is later than the end date. Please check your input"
+          message: "The start date is later than the end date. Please check your input"
         }
       });
     }
@@ -67,14 +67,14 @@ export async function getHistoricalBalance(url: string, apiKey: string, dateFrom
       return {
         status: transactionsRes.data.status,
         data: {
-        transactionsResponse: transactionsRes.data,
+          transactionsResponse: transactionsRes.data,
         }
       }
     } else {
       return {
         status: balanceRes.data.status,
         data: {
-        transactionsResponse: transactionsRes.data,
+          transactionsResponse: transactionsRes.data,
         }
       }
     }
@@ -83,7 +83,7 @@ export async function getHistoricalBalance(url: string, apiKey: string, dateFrom
 
 export function checkDatesFormatValidity(dateFrom: string, dateTo: string) {
   const regEx = /^\d{4}-\d{2}-\d{2}$/;
-  return !(!dateFrom.match(regEx) && !dateTo.match(regEx))
+  return (dateFrom.match(regEx) && dateTo.match(regEx)) ? true : false;
 }
 
 export function checkDatesExistence(dateFrom: string, dateTo: string) {
@@ -160,7 +160,7 @@ export function getDailyBalance(transactions: Array<JsonObject>, balanceOfDateTo
           return ({
             status: 400,
             data: {
-            message: 'Invalid sort preference. See proper request format in Readme.dm.'
+              message: 'Invalid sort preference. See proper request format in Readme.dm'
             }
           })
         }
@@ -169,9 +169,18 @@ export function getDailyBalance(transactions: Array<JsonObject>, balanceOfDateTo
       }
     }
   }
-  console.log("Succesfully got the daily balace for the specific date range: from " + dateFrom + " to " + dateTo + ", the sorting order is " + sort);
-  return {
-    status: 200,
-    data: dailyBalanceArr
+
+  if (dailyBalanceArr.length > 0) {
+    return {
+      status: 200,
+      data: dailyBalanceArr
+    };
+  } else {
+    return {
+      status: 200,
+      data: {
+        message: "Nothing was found for your request"
+      }
+    };
   }
 }

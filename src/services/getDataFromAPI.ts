@@ -10,7 +10,7 @@ try {
       console.log("Couldn't get data from Banxware API");
         return {
           data: {
-            status: 400,
+            status: 502,
             message: "Couldn't get data from Banxware API",
             error: response.statusText
         },
@@ -37,28 +37,5 @@ try {
       },
       isSuccesfull: false
     }
-  
   }
 }
-
-
-// export function getBalances<T>(url: string, apiKey: string): Promise<T> {
-//     return fetch(url, {
-//         method: "GET",
-//         headers: {
-//           "x-api-key": apiKey
-//         }
-//       })
-//         .then(response => {
-//           console.log(response)
-//           if (!response.ok) {
-//             throw new Error(response.statusText)
-//           }
-    
-//           return response.json() as Promise<{ data: T }>
-//         })
-//         .then(data => {
-//             console.log(data)
-//             return data.data
-//         })
-//   }
