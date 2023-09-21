@@ -170,7 +170,9 @@ export function getDailyBalance(transactions: Array<JsonObject>, balanceOfDateTo
   if (dailyBalanceArr.length > 0) {
     return {
       status: 200,
-      data: dailyBalanceArr
+      data: {
+      balances: dailyBalanceArr
+      }
     };
   } else {
     return {
