@@ -59,7 +59,7 @@ Example response:
 
 ```json
 {
-    [
+    "balances": [
         {
             "date": "05/01/2022",
             "amount": 1514,

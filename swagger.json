@@ -139,7 +139,7 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "transactions": {
+                    "balances": {
                       "type": "array",
                       "items": {
                         "type": "object",
