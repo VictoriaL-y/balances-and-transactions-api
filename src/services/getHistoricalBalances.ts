@@ -137,41 +137,27 @@ export function getDailyBalance(transactions: Array<JsonObject>, balanceOfDateTo
         balanceOfDateTo -= transaction.amount;
         continue;
       } else {
-        if (sort === "desc" || !sort) { // it'll be possible to use the route without sort parameter and by default the order will be descendent
-          sort = "desc";
-          dailyBalanceArr.push(
-            {
-              date: dateInNewFormat,
-              amount: balanceOfDateTo,
-              currency: transaction.currency
-            });
-        } else if (sort === "asc") {
-          dailyBalanceArr.unshift(
-            {
-              date: dateInNewFormat,
-              amount: balanceOfDateTo,
-              currency: transaction.currency
-            });
-        } else {
-          console.log("Invalid sort preference: " + sort);
-          return ({
-            status: 400,
-            data: {
-              message: 'Invalid sort preference. See proper request format in Readme.dm'
-            }
-          })
-        }
+        dailyBalanceArr.push(
+          {
+            date: dateInNewFormat,
+            amount: balanceOfDateTo,
+            currency: transaction.currency
+          });
         balanceOfDateTo -= transaction.amount;
         tempDate = dateInNewFormat;
       }
     }
   }
 
+  if (sort === "asc") {
+    dailyBalanceArr.reverse();
+  }
+
   if (dailyBalanceArr.length > 0) {
     return {
       status: 200,
       data: {
-      balances: dailyBalanceArr
+        balances: dailyBalanceArr
       }
     };
   } else {

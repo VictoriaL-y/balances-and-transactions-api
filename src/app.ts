@@ -53,6 +53,17 @@ app.get("/historical-balances", async (req, res) => {
     })
   }
   console.log("The date range starts on " + dateFrom + ", ends on " + dateTo + ", the sorting order is " + sort);
+
+  // check the sort order specified by the user
+  if (!sort) {
+    sort = "desc"
+  } else if (sort !== "desc" && sort !== "asc") {
+    console.log("Invalid sort preference: " + sort);
+    return res.status(400).json({
+      message: 'Invalid sort preference. See proper request format in Readme.dm'
+    });
+  }
+
   const historicalBalance = await getHistoricalBalance(url, apiKey, dateFrom, dateTo, sort);
   return res.status(historicalBalance.status).json(historicalBalance.data);
 });
@@ -64,7 +75,7 @@ app.use((req, res) => {
     console.log("Invalid request, this route doesn't exist: " + req.url);
   }
   res.status(404).json({
-      message: "Invalid request, this route doesn't exist"
+    message: "Invalid request, this route doesn't exist"
   });
 });
 
