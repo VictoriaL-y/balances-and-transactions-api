@@ -8,8 +8,11 @@ export async function getHistoricalBalance(url: string, apiKey: string, dateFrom
 
   if (transactionsRes.isSuccesfull && balanceRes.isSuccesfull) {
     console.log("Succesfully got all the transactions and balance data");
-    // check if the data that user entered is invalid
-    if (!checkDatesFormatValidity(dateFrom, dateTo)) {
+
+    // check if the dates that user entered are invalid
+    const checkDateFrom = checkDateValidity(dateFrom);
+    const checkDateTo = checkDateValidity(dateTo);
+    if (!checkDateFrom || !checkDateTo) {
       console.log("Invalid dates format: " + dateFrom + " or/and " + dateTo);
       return ({
         status: 400,
@@ -17,16 +20,10 @@ export async function getHistoricalBalance(url: string, apiKey: string, dateFrom
           message: 'Invalid dates format. See proper request format in Readme.dm'
         }
       });
-    }
-
-    if (!checkDatesExistence(dateFrom, dateTo)) {
-      console.log("At least one of the dates doesn't exist: " + dateFrom + " or/and " + dateTo);
-      return ({
-        status: 400,
-        data: {
-          message: "At least one of the dates doesn't exist (e.g. Feb 29th). Please check your input"
-        }
-      });
+    } else if (typeof (checkDateFrom) === "object") {
+      return checkDateFrom;
+    } else if (typeof (checkDateTo) === "object") {
+      return checkDateTo;
     }
 
     if (!checkDatesRangeValidity(dateFrom, dateTo)) {
@@ -81,27 +78,28 @@ export async function getHistoricalBalance(url: string, apiKey: string, dateFrom
   }
 }
 
-export function checkDatesFormatValidity(dateFrom: string, dateTo: string) {
+export function checkDateValidity(date: string) {
+  const error = {
+    status: 400,
+    data: {
+      message: "At least one of the dates doesn't exist (e.g. Feb 29th). Please check your input"
+    }
+  }
+
   const regEx = /^\d{4}-\d{2}-\d{2}$/;
-  return (dateFrom.match(regEx) && dateTo.match(regEx)) ? true : false;
-}
-
-export function checkDatesExistence(dateFrom: string, dateTo: string) {
-  const dateFromCorrected = dateFrom.replace(/[^a-zA-Z0-9]/g, '-');
-  let dFrom = new Date(dateFromCorrected);
-  let dNumFrom = dFrom.getTime();
-
-  const dateToCorrected = dateTo.replace(/[^a-zA-Z0-9]/g, '-')
-  let dTo = new Date(dateToCorrected);
-  let dNumTo = dTo.getTime();
-
-  if ((!dNumFrom && dNumFrom !== 0) || (!dNumTo && dNumTo !== 0)) { // check if NaN
-    return false;
-  } else if ((dFrom.toISOString().slice(0, 10) !== dateFromCorrected)
-    || (dTo.toISOString().slice(0, 10) !== dateToCorrected)) { // check if invalid (e.g. 2022-02-30)
-    return false;
-  } else {
+  if (date.match(regEx)) {
+    const editedDate = date.replace(/[^0-9]+/g, "")
+    const year = parseInt(editedDate.slice(0, 4));
+    const month = parseInt(editedDate.slice(4, 6));
+    const day = parseInt(editedDate.slice(6));
+    const d = new Date(year, month - 1, day);
+    if (d.getFullYear() !== year || d.getMonth() !== month - 1) {
+      console.log("Invalid date");
+      return error;
+    }
     return true;
+  } else {
+    return false
   }
 }
 
